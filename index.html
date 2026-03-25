@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Harmonium</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { height: 100dvh; }
+
+    body {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at center, #1a0e06 0%, #0d0704 100%);
+      font-family: Georgia, 'Times New Roman', serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* ── Outer wooden body ── */
+    .harmonium-body {
+      background: linear-gradient(160deg, #5c2e0a 0%, #3b1a05 40%, #2a1203 100%);
+      border-radius: 12px 12px 6px 6px;
+      padding: 18px 22px 22px;
+      box-shadow:
+        0 30px 80px rgba(0,0,0,0.8),
+        inset 0 1px 0 rgba(255,200,100,0.15),
+        inset 0 -2px 4px rgba(0,0,0,0.5);
+      border: 1px solid #7a3f10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── Top decorative panel ── */
+    .top-panel {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 0 14px;
+      gap: 12px;
+    }
+    .top-panel::before, .top-panel::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #c8801a, transparent);
+    }
+
+    h1 {
+      color: #d4901a;
+      font-size: clamp(0.85rem, 2.5vw, 1.3rem);
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      font-weight: normal;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+      white-space: nowrap;
+    }
+
+    /* ── Grille / bellows ── */
+    .grille {
+      width: 100%;
+      height: clamp(14px, 2.5vw, 24px);
+      margin-bottom: 10px;
+      display: grid;
+      grid-template-columns: repeat(20, 1fr);
+      gap: 2px;
+      opacity: 0.6;
+    }
+    .grille-bar {
+      background: linear-gradient(to bottom, #8b4a0e, #3b1a05);
+      border-radius: 1px;
+    }
+
+    /* ── Keyboard frame ── */
+    .keyboard-frame {
+      background: linear-gradient(to bottom, #1a0a02, #0d0501);
+      border-radius: 4px 4px 8px 8px;
+      padding: 10px 10px 14px;
+      box-shadow: inset 0 4px 12px rgba(0,0,0,0.8);
+      /* needed so mobile flex: 1 can shrink it */
+      min-height: 0;
+    }
+
+    /* ── Keyboard container ── */
+    .keyboard {
+      position: relative;
+      display: flex;
+      flex-direction: row;      /* horizontal on desktop */
+      align-items: flex-start;
+      border-radius: 0 0 4px 4px;
+    }
+
+    /* ══════════════════════════════════════
+       HORIZONTAL KEYS  (desktop)
+    ══════════════════════════════════════ */
+    .key-white {
+      position: relative;
+      width: clamp(36px, 6vw, 60px);
+      height: clamp(120px, 20vw, 185px);
+      background: linear-gradient(to bottom, #f0ead8 0%, #faf6ec 30%, #ede6d0 100%);
+      border: 1px solid #b8956a;
+      border-top: 2px solid #c8a070;
+      border-radius: 0 0 5px 5px;
+      cursor: pointer;
+      transition: background 0.04s, transform 0.04s;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 8px;
+      flex-shrink: 0;
+      box-shadow: inset 0 -3px 6px rgba(184,149,106,0.3), 1px 0 0 rgba(184,149,106,0.4);
+    }
+    .key-white:active, .key-white.active {
+      background: linear-gradient(to bottom, #e8d5a0 0%, #f0c860 40%, #d4a830 100%);
+      transform: translateY(3px);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .key-white .label {
+      font-size: clamp(9px, 1.2vw, 11px);
+      color: #9a7a50;
+      font-family: system-ui, sans-serif;
+      pointer-events: none;
+      line-height: 1;
+    }
+
+    .key-black {
+      position: absolute;
+      width: clamp(22px, 3.6vw, 38px);
+      height: clamp(72px, 12vw, 118px);
+      background: linear-gradient(to bottom, #1a0f05 0%, #0d0803 60%, #1a0f05 100%);
+      border-radius: 0 0 4px 4px;
+      cursor: pointer;
+      z-index: 2;
+      top: 0;
+      transition: background 0.04s, transform 0.04s;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 6px;
+      box-shadow: 2px 4px 8px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,180,80,0.1);
+      border: 1px solid #3a1e08;
+      border-top: none;
+    }
+    .key-black:active, .key-black.active {
+      background: linear-gradient(to bottom, #3a2005, #c89020);
+      transform: translateY(3px);
+    }
+    .key-black .label {
+      font-size: clamp(7px, 1vw, 9px);
+      color: #6a4a20;
+      font-family: system-ui, sans-serif;
+      pointer-events: none;
+      line-height: 1;
+    }
+
+    .bottom-strip {
+      width: 100%;
+      height: 8px;
+      background: linear-gradient(to bottom, #7a3f10, #4a2008);
+      border-radius: 0 0 4px 4px;
+      margin-top: 4px;
+    }
+
+    .hint {
+      color: #7a4a18;
+      font-size: clamp(0.6rem, 1.4vw, 0.75rem);
+      letter-spacing: 0.06em;
+      margin-top: 16px;
+      font-family: system-ui, sans-serif;
+      text-align: center;
+      padding: 0 12px;
+    }
+
+    /* ══════════════════════════════════════
+       VERTICAL LAYOUT  (mobile — fixed full-screen)
+    ══════════════════════════════════════ */
+    @media (max-width: 600px) {
+      html, body {
+        height: 100dvh;
+        overflow: hidden;
+      }
+
+      /* pin harmonium to exact viewport — no flex inheritance needed */
+      .harmonium-body {
+        position: fixed;
+        inset: 0;                 /* top:0 right:0 bottom:0 left:0 */
+        width: 100dvw;
+        height: 100dvh;
+        border-radius: 0;
+        border: none;
+        padding: 6px 8px 4px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        box-shadow: none;
+      }
+
+      .top-panel {
+        flex-shrink: 0;
+        padding: 2px 0 5px;
+      }
+
+      .grille {
+        flex-shrink: 0;
+        height: 8px;
+        margin-bottom: 5px;
+      }
+
+      /* frame takes all remaining height */
+      .keyboard-frame {
+        flex: 1;
+        min-height: 0;
+        width: 100%;
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        border-radius: 4px;
+      }
+
+      /* keyboard fills the frame */
+      .keyboard {
+        flex: 1;
+        min-height: 0;
+        flex-direction: column;
+        width: 100%;
+        align-items: stretch;
+        border-radius: 4px;
+      }
+
+      /* 12 white keys share the full height equally */
+      .key-white {
+        flex: 1 1 0px;
+        min-height: 0;
+        width: 100%;
+        height: 0;
+        border-radius: 0 5px 5px 0;
+        border-top: 1px solid #b8956a;
+        border-bottom: 1px solid #b8956a;
+        border-left: 3px solid #c8a070;
+        border-right: none;
+        align-items: center;
+        justify-content: flex-start;
+        padding-bottom: 0;
+        padding-left: 10px;
+        box-shadow: inset -4px 0 8px rgba(184,149,106,0.2),
+                    0 1px 0 rgba(184,149,106,0.3);
+      }
+      .key-white:active, .key-white.active {
+        transform: translateX(4px);
+        box-shadow: inset 2px 0 4px rgba(0,0,0,0.2);
+      }
+
+      /* black keys — right side, sized + positioned by JS */
+      .key-black {
+        left: auto !important;
+        right: 0;
+        top: auto;
+        border-radius: 0 4px 4px 0;
+        border-left:   none;
+        border-right:  none;
+        border-top:    1px solid #3a1e08;
+        border-bottom: 1px solid #3a1e08;
+        box-shadow: -4px 2px 8px rgba(0,0,0,0.7);
+        padding-bottom: 0;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 6px;
+      }
+      .key-black:active, .key-black.active {
+        transform: translateX(-4px);
+      }
+
+      .bottom-strip { display: none; }
+      .hint         { display: none; }
+    }
+
+    /* ── View transition ── */
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation-duration: 0.25s;
+      animation-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+    }
+  </style>
+</head>
+<body>
+
+<div class="harmonium-body">
+  <div class="top-panel"><h1>Harmonium</h1></div>
+  <div class="grille" id="grille"></div>
+  <div class="keyboard-frame">
+    <div class="keyboard" id="keyboard"></div>
+  </div>
+  <div class="bottom-strip"></div>
+</div>
+<p class="hint" id="hint">tap a key &nbsp;·&nbsp; keyboard: A S D F G H J &nbsp;·&nbsp; sharps: W E T Y U</p>
+
+<script>
+// ── Grille bars ──
+const grille = document.getElementById('grille');
+for (let i = 0; i < 20; i++) {
+  const b = document.createElement('div');
+  b.className = 'grille-bar';
+  grille.appendChild(b);
+}
+
+// ── Notes ──
+const NOTES = [
+  { note:'C3',  type:'white', kb:'a' },
+  { note:'C#3', type:'black', kb:'w' },
+  { note:'D3',  type:'white', kb:'s' },
+  { note:'D#3', type:'black', kb:'e' },
+  { note:'E3',  type:'white', kb:'d' },
+  { note:'F3',  type:'white', kb:'f' },
+  { note:'F#3', type:'black', kb:'t' },
+  { note:'G3',  type:'white', kb:'g' },
+  { note:'G#3', type:'black', kb:'y' },
+  { note:'A3',  type:'white', kb:'h' },
+  { note:'A#3', type:'black', kb:'u' },
+  { note:'B3',  type:'white', kb:'j' },
+  { note:'C4',  type:'white', kb:'k' },
+  { note:'C#4', type:'black', kb:'o' },
+  { note:'D4',  type:'white', kb:'l' },
+  { note:'D#4', type:'black', kb:'p' },
+  { note:'E4',  type:'white', kb:';' },
+  { note:'F4',  type:'white', kb:"'" },
+  { note:'F#4', type:'black', kb:']' },
+  { note:'G4',  type:'white', kb:'\\' },
+];
+
+// ── Frequency ──
+function noteToFreq(note) {
+  const m = { C:0,'C#':1,D:2,'D#':3,E:4,F:5,'F#':6,G:7,'G#':8,A:9,'A#':10,B:11 };
+  const x = note.match(/^([A-G]#?)(\d)$/);
+  return 440 * Math.pow(2, ((parseInt(x[2])+1)*12 + m[x[1]] - 69) / 12);
+}
+
+// ── Harmonium synth (sustained while held) ──
+let ctx = null;
+function getCtx() {
+  if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+  if (ctx.state === 'suspended') ctx.resume();
+  return ctx;
+}
+
+const activeNodes = new Map();
+
+function noteOn(noteStr) {
+  if (activeNodes.has(noteStr)) return;
+  const ac = getCtx(), now = ac.currentTime, freq = noteToFreq(noteStr);
+
+  const osc1 = ac.createOscillator();
+  const osc2 = ac.createOscillator();
+  const osc3 = ac.createOscillator();
+  osc1.type = osc2.type = osc3.type = 'sawtooth';
+  osc1.frequency.value = freq;
+  osc2.frequency.value = freq * 1.003;
+  osc3.frequency.value = freq * 2.001;
+
+  const filter = ac.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = freq * 6;
+  filter.Q.value = 0.8;
+
+  const octGain = ac.createGain();
+  octGain.gain.value = 0.25;
+
+  const gain = ac.createGain();
+  gain.gain.setValueAtTime(0, now);
+  gain.gain.linearRampToValueAtTime(0.18, now + 0.025);
+
+  osc1.connect(filter); osc2.connect(filter);
+  osc3.connect(octGain); octGain.connect(filter);
+  filter.connect(gain); gain.connect(ac.destination);
+
+  osc1.start(now); osc2.start(now); osc3.start(now);
+  activeNodes.set(noteStr, { oscs:[osc1,osc2,osc3], gain });
+}
+
+function noteOff(noteStr) {
+  const node = activeNodes.get(noteStr);
+  if (!node) return;
+  const ac = getCtx(), now = ac.currentTime;
+  node.gain.gain.cancelScheduledValues(now);
+  node.gain.gain.setValueAtTime(node.gain.gain.value, now);
+  node.gain.gain.linearRampToValueAtTime(0.0001, now + 0.08);
+  node.oscs.forEach(o => o.stop(now + 0.1));
+  activeNodes.delete(noteStr);
+}
+
+// ── Build DOM ──
+const keyboard = document.getElementById('keyboard');
+const whiteKeys = [], blackKeys = [];
+
+NOTES.forEach(n => {
+  const el = document.createElement('div');
+  el.className = n.type === 'white' ? 'key-white' : 'key-black';
+  el.dataset.note = n.note;
+  const label = document.createElement('span');
+  label.className = 'label';
+  label.textContent = n.kb.toUpperCase();
+  el.appendChild(label);
+  if (n.type === 'white') { keyboard.appendChild(el); whiteKeys.push({ el, note:n }); }
+  else blackKeys.push({ el, note:n });
+});
+
+// ── Position black keys (orientation-aware) ──
+const blackSlots = { 'C#':0.5, 'D#':1.5, 'F#':3.5, 'G#':4.5, 'A#':5.5 };
+
+function isVertical() { return window.innerWidth <= 600; }
+
+function whiteKeySize() {
+  const first = keyboard.querySelector('.key-white');
+  if (!first) return 48;
+  const r = first.getBoundingClientRect();
+  return isVertical() ? r.height : r.width;
+}
+
+function positionBlackKeys() {
+  const ks = whiteKeySize();
+  const bs = ks * 0.62;
+  const vertical = isVertical();
+
+  blackKeys.forEach(({ el, note }) => {
+    const match = note.note.match(/^([A-G]#?)(\d)$/);
+    const noteName = match[1], octave = parseInt(match[2]);
+    const slot = blackSlots[noteName];
+    if (slot === undefined) return;
+
+    const whitesBeforeOctave = whiteKeys.filter(w => {
+      const wm = w.note.note.match(/^([A-G]#?)(\d)$/);
+      return parseInt(wm[2]) < octave;
+    }).length;
+
+    const offset = (whitesBeforeOctave + slot) * ks - bs / 2;
+
+    if (vertical) {
+      el.style.top    = offset + 'px';
+      el.style.left   = 'auto';
+      el.style.right  = '0';
+      el.style.height = bs + 'px';
+      el.style.width  = '38%';
+    } else {
+      el.style.left   = offset + 'px';
+      el.style.right  = '';
+      el.style.top    = '0';
+      el.style.width  = bs + 'px';
+      el.style.height = '';
+    }
+
+    if (!el.parentElement) keyboard.appendChild(el);
+  });
+}
+
+// Use rAF so CSS is applied before we measure
+requestAnimationFrame(() => {
+  positionBlackKeys();
+});
+window.addEventListener('resize', positionBlackKeys);
+
+// ── Interaction ──
+const kbMap = {};
+NOTES.forEach(n => { kbMap[n.kb] = n.note; });
+
+function activate(noteStr) {
+  const el = keyboard.querySelector(`[data-note="${noteStr}"]`);
+  if (el) el.classList.add('active');
+  noteOn(noteStr);
+}
+function deactivate(noteStr) {
+  const el = keyboard.querySelector(`[data-note="${noteStr}"]`);
+  if (el) el.classList.remove('active');
+  noteOff(noteStr);
+}
+
+// Mouse
+keyboard.addEventListener('mousedown', e => {
+  const key = e.target.closest('[data-note]');
+  if (key) activate(key.dataset.note);
+});
+window.addEventListener('mouseup', () => {
+  keyboard.querySelectorAll('.active').forEach(k => deactivate(k.dataset.note));
+});
+
+// Touch — with slide (glissando) support
+const touchNotes = new Map();
+
+keyboard.addEventListener('touchstart', e => {
+  e.preventDefault();
+  Array.from(e.changedTouches).forEach(t => {
+    const el  = document.elementFromPoint(t.clientX, t.clientY);
+    const key = el && el.closest('[data-note]');
+    if (key) { activate(key.dataset.note); touchNotes.set(t.identifier, key.dataset.note); }
+  });
+}, { passive: false });
+
+keyboard.addEventListener('touchmove', e => {
+  e.preventDefault();
+  Array.from(e.changedTouches).forEach(t => {
+    const el      = document.elementFromPoint(t.clientX, t.clientY);
+    const key     = el && el.closest('[data-note]');
+    const prevNote = touchNotes.get(t.identifier);
+    const newNote  = key ? key.dataset.note : null;
+    if (prevNote !== newNote) {
+      if (prevNote) deactivate(prevNote);
+      if (newNote) { activate(newNote); touchNotes.set(t.identifier, newNote); }
+      else touchNotes.delete(t.identifier);
+    }
+  });
+}, { passive: false });
+
+keyboard.addEventListener('touchend', e => {
+  e.preventDefault();
+  Array.from(e.changedTouches).forEach(t => {
+    const note = touchNotes.get(t.identifier);
+    if (note) deactivate(note);
+    touchNotes.delete(t.identifier);
+  });
+}, { passive: false });
+
+// Keyboard (laptop)
+const held = new Set();
+window.addEventListener('keydown', e => {
+  if (e.repeat) return;
+  const k = e.key.toLowerCase(), note = kbMap[k];
+  if (note && !held.has(k)) { held.add(k); activate(note); }
+});
+window.addEventListener('keyup', e => {
+  const k = e.key.toLowerCase(); held.delete(k);
+  const note = kbMap[k]; if (note) deactivate(note);
+});
+
+if ('ontouchstart' in window) {
+  document.getElementById('hint').textContent = 'slide your finger across keys to play';
+}
+</script>
+</body>
+</html>
