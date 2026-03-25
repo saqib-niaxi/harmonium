@@ -70,7 +70,7 @@ A A A A A  W  A U  E  W  A U
 Just open `index.html` in any browser — no server needed.
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/harmonium.git
+git clone  https://saqib-niaxi.github.io/harmonium/
 cd harmonium
 # open index.html in your browser
 ```
